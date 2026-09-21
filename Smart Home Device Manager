@@ -1,0 +1,89 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+using namespace std;
+
+class SmartDevice {
+private:
+    int deviceId;
+    string location;
+    string type;
+    bool status;
+    string lastUpdated;
+    static int totalDevices;
+
+    string getCurrentTime() {
+        time_t now = time(0);
+        char* dt = ctime(&now);
+        string t(dt);
+        if (!t.empty() && t.back() == '\n') t.pop_back();
+        return t;
+    }
+
+public:
+    SmartDevice(int id, string loc, string devType, bool st)
+        : deviceId(id), location(loc), type(devType), status(st) {
+        lastUpdated = getCurrentTime();
+        totalDevices++;
+    }
+
+    void switchOn() {
+        status = true;
+        lastUpdated = getCurrentTime();
+    }
+
+    void switchOff() {
+        status = false;
+        lastUpdated = getCurrentTime();
+    }
+
+    void changeStatus(bool newStatus) {
+        status = newStatus;
+        lastUpdated = getCurrentTime();
+    }
+
+    void display() const {
+        cout << "ID: " << deviceId
+             << " | Type: " << type
+             << " | Location: " << location
+             << " | Status: " << (status ? "ON" : "OFF")
+             << " | Last Updated: " << lastUpdated << endl;
+    }
+
+    static int getTotalDevices() {
+        return totalDevices;
+    }
+
+    ~SmartDevice() {
+        totalDevices--;
+    }
+};
+
+int SmartDevice::totalDevices = 0;
+
+int main() {
+    vector<SmartDevice> home;
+
+    home.emplace_back(1, "Living Room", "Light", true);
+    home.emplace_back(2, "Bedroom", "Thermostat", false);
+    home.emplace_back(3, "Front Door", "Camera", true);
+    home.emplace_back(4, "Main Gate", "Door Lock", false);
+
+    cout << "== Smart Home Dashboard ==" << endl;
+    for (const auto& d : home) {
+        d.display();
+    }
+
+    cout << "\nSwitching Bedroom Thermostat ON...\n";
+    home[1].switchOn();
+
+    cout << "\n== Updated Dashboard ==" << endl;
+    for (const auto& d : home) {
+        d.display();
+    }
+
+    cout << "\nTotal Devices: " << SmartDevice::getTotalDevices() << endl;
+
+    return 0;
+}
